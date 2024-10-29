@@ -1,14 +1,11 @@
-{
-    "Servers": {
-      "1": {
-        "Name": "Postgres Container",
-        "Group": "Servers",
-        "Host": "postgres",
-        "Port": 5432,
-        "Username": "postgres",
-        "Password": "postgres",
-        "SSLMode": "prefer"
-      }
-    }
+[
+  {
+    "Name": "postgres",
+    "Group": "Servers",
+    "Host": "postgres",
+    "Port": 5432,
+    "Username": "postgres",
+    "Password": "postgres",
+    "SSLMode": "prefer"
   }
-  
+]
