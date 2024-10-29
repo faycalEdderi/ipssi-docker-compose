@@ -1,21 +1,23 @@
-# docker/frontend.dockerfile
-
-# Étape de construction
-FROM node:16-alpine as build
+# frontend.dockerfile
+FROM node:14
 
 # Définir le répertoire de travail
-WORKDIR /app
+WORKDIR /usr/src/app
+
+# Copier les fichiers package.json et package-lock.json
+COPY package*.json ./
 
 # Installer les dépendances
-COPY src/package*.json ./
 RUN npm install
 
-# Copier le code du frontend et construire le projet
-COPY src/ ./
+# Copier le reste des fichiers
+COPY ./src ./src
+
+# Construire l'application
 RUN npm run build
 
-# Étape de production avec Nginx
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Exposer le port de l'application
+EXPOSE 8080
+
+# Commande pour démarrer l'application
+CMD ["npm", "run", "serve"]

@@ -1,18 +1,20 @@
-# Utiliser une image Python
-FROM python:3.9-slim
+# Utiliser l'image officielle de Node.js
+FROM node:14
 
 # Définir le répertoire de travail
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Copier le fichier requirements.txt et installer les dépendances
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Copier le fichier package.json et package-lock.json
+COPY ./backend/package*.json ./
 
-# Copier le code du backend
-COPY src/ ./src
+# Installer les dépendances
+RUN npm install
 
-# Exposer le port interne pour Django
-EXPOSE 8000
+# Copier le reste du code source
+COPY backend/src .
 
-# Démarrer le serveur Django
-CMD ["python", "src/manage.py", "runserver", "0.0.0.0:8000"]
+# Exposer le port sur lequel l'application écoute
+EXPOSE 3000
+
+# Commande pour démarrer l'application
+CMD ["node", "index.js"]
