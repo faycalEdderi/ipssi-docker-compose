@@ -1,17 +1,21 @@
 version: "3.8"
 
 services:
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/frontend.dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - backend
+
   backend:
     build:
-      context: .
-      dockerfile: docker/backend.dockerfile
+      context: ./docker
+      dockerfile: backend.dockerfile
     ports:
       - "3000:3000"
-    volumes:
-      - ./backend:/usr/src/app
-      - /usr/src/app/node_modules
-    environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     depends_on:
       - postgres
     env_file:
@@ -19,10 +23,6 @@ services:
 
   postgres:
     image: postgres:latest
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
     env_file: docker/postgres.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
