@@ -11,6 +11,8 @@ services:
       - ./frontend:/app
     depends_on:
       - backend
+    networks:
+      - my_bridge_network
 
   backend:
     build:
@@ -24,6 +26,8 @@ services:
       - docker/backend.env
     volumes:
       - ./backend:/usr/src/app
+    networks:
+      - my_bridge_network
 
   postgres:
     image: postgres:latest
