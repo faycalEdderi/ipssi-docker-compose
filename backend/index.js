@@ -21,10 +21,30 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+// Fonction pour créer la base de données et la table
+const setupDatabase = async () => {
+  try {
+    // Créer la table 'items' si elle n'existe pas
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS items (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT
+      )
+    `);
+    console.log('Table items créée ou déjà existante.');
+  } catch (error) {
+    console.error('Erreur lors de la création de la table :', error);
+  }
+};
+
+// Appeler la fonction pour configurer la base de données
+setupDatabase();
+
 // Route pour récupérer tous les items
 app.get('/api/data', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM items'); // Remplacez par le nom de votre table
+    const result = await pool.query('SELECT * FROM items');
     res.json(result.rows);
   } catch (error) {
     console.error('Erreur lors de la récupération des données:', error);
