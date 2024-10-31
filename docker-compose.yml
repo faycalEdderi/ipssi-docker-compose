@@ -11,6 +11,8 @@ services:
       - ./frontend:/app
     depends_on:
       - backend
+    env_file:
+      - docker/frontend.env
     networks:
       - my_bridge_network
 
