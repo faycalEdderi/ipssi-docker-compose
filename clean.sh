@@ -10,19 +10,15 @@ clean_bdd() {
 clean_all() {
     echo "Démarrage du nettoyage complet..."
 
-    # Arrêter et supprimer tous les conteneurs
     docker-compose down
     docker container prune -f
 
-    # Nettoyer les volumes
     docker volume prune -f
 
-    # Nettoyer les réseaux
     docker network prune -f
 
-    # Supprimer le dossier node_modules si présent
     if [ -d "node_modules" ]; then
-        echo "Suppression de node_modules en cours..."
+        echo "Suppression de node_modules"
         rm -rf node_modules
         echo "node_modules supprimé."
     else
