@@ -7,6 +7,7 @@ const App = () => {
   const [items, setItems] = useState([]);
   const [error, setError] = useState(null);
   const [newItem, setNewItem] = useState({ name: '', description: '' });
+  const [selectedItem, setSelectedItem] = useState({ id: '', name: '', description: '' });
 
   useEffect(() => {
     fetchData();
@@ -22,31 +23,48 @@ const App = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  // Fonction pour créer un nouvel élément
+  const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(apiUrl, newItem);
-      setItems([...items, response.data]);
-      setNewItem({ name: '', description: '' }); // Réinitialiser le formulaire
+      await axios.post(apiUrl, newItem);
+      fetchData();
+      setNewItem({ name: '', description: '' }); // Réinitialiser le formulaire de création
     } catch (error) {
-      console.error('Erreur lors de l\'ajout:', error);
+      console.error('Erreur lors de la création:', error);
     }
   };
 
-  const handleUpdate = async (id) => {
-    const updatedItem = { name: 'Nouveau nom', description: 'Nouvelle description' }; // Remplacez par vos valeurs
+  // Fonction pour mettre à jour un élément
+  const handleUpdate = (item) => {
+    setSelectedItem({ id: item.id, name: item.name, description: item.description });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (selectedItem.id) {
+      setSelectedItem((prev) => ({ ...prev, [name]: value }));
+    } else {
+      setNewItem((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmitUpdate = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.put(`${apiUrl}/${id}`, updatedItem);
-      setItems(items.map(item => (item.id === id ? response.data : item)));
+      await axios.put(`${apiUrl}/${selectedItem.id}`, selectedItem);
+      fetchData();
+      setSelectedItem({ id: '', name: '', description: '' }); // Réinitialiser le formulaire de modification
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
     }
   };
 
+  // Fonction pour supprimer un élément
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${apiUrl}/${id}`);
-      setItems(items.filter(item => item.id !== id));
+      fetchData();
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
     }
@@ -54,35 +72,60 @@ const App = () => {
 
   return (
     <div>
-      <h1>Mon Application</h1>
+      <h1>Mon Application CRUD</h1>
       {error && <p>Erreur de récupération des données.</p>}
-      <form onSubmit={handleSubmit}>
+
+      {/* Formulaire de création d'un nouvel élément */}
+      <form onSubmit={handleCreate}>
+        <h2>Créer un nouvel item</h2>
         <input
           type="text"
-          placeholder="Nom"
+          name="name"
           value={newItem.name}
-          onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-          required
+          onChange={handleChange}
+          placeholder="Nom"
         />
-        <input
-          type="text"
-          placeholder="Description"
+        <textarea
+          name="description"
           value={newItem.description}
-          onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-          required
+          onChange={handleChange}
+          placeholder="Description"
         />
-        <button type="submit">Ajouter</button>
+        <button type="submit">Créer</button>
       </form>
+
+      {/* Liste des éléments avec options de modification et de suppression */}
       <ul>
-        {items.map(item => (
+        {items.map((item) => (
           <li key={item.id}>
             <h2>{item.name}</h2>
             <p>{item.description}</p>
-            <button onClick={() => handleUpdate(item.id)}>Mettre à jour</button>
+            <button onClick={() => handleUpdate(item)}>Modifier</button>
             <button onClick={() => handleDelete(item.id)}>Supprimer</button>
           </li>
         ))}
       </ul>
+
+      {/* Formulaire de modification d'un élément existant */}
+      {selectedItem.id && (
+        <form onSubmit={handleSubmitUpdate}>
+          <h2>Modifier l'item</h2>
+          <input
+            type="text"
+            name="name"
+            value={selectedItem.name}
+            onChange={handleChange}
+            placeholder="Nom"
+          />
+          <textarea
+            name="description"
+            value={selectedItem.description}
+            onChange={handleChange}
+            placeholder="Description"
+          />
+          <button type="submit">Mettre à jour</button>
+        </form>
+      )}
     </div>
   );
 };
